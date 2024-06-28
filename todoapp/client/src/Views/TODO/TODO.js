@@ -31,7 +31,7 @@ export function TODO(props) {
             return response.data
         } catch (err) {
             console.log(err);
-            return []; // return an empty array in case of error
+            return [];
         }
     }
 
@@ -43,7 +43,8 @@ export function TODO(props) {
                 accept: "application/json",
             },
             data: {
-                title: newTodo
+                title: newTodo,
+                desciption: 'Add description'            
             }
         }
         axios
@@ -100,6 +101,50 @@ export function TODO(props) {
             })
     };
 
+    const editTodo = (id,newName) => {
+        const options = {
+            method: "PATCH",
+            url: `http://localhost:8000/api/todo/${id}`,
+            headers: {
+                accept: "application/json",
+            },
+            data: {
+                title: newName
+            }
+        }
+        axios
+            .request(options)
+            .then(function (response) {
+                console.log(response.data)
+                setTodoData(prevData => prevData.map(todo => todo._id === id ? response.data : todo))
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
+    const descTodo = (id,desc) => {
+        const options = {
+            method: "PATCH",
+            url: `http://localhost:8000/api/todo/${id}`,
+            headers: {
+                accept: "application/json",
+            },
+            data: {
+                description: desc
+            }
+        }
+        axios
+            .request(options)
+            .then(function (response) {
+                console.log(response.data)
+                setTodoData(prevData => prevData.map(todo => todo._id === id ? response.data : todo))
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
     return (
         <div className={Styles.ancestorContainer}>
             <div className={Styles.headerContainer}>
@@ -146,13 +191,35 @@ export function TODO(props) {
                                     />
                                     {entry.title}
                                 </span>
+                                <span className={Styles.infoContainer}>
+                                    <h6>{entry.description}</h6>
+                                </span>
                                 <span
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ color:'red',cursor: 'pointer' ,margin:'5px'}}
                                     onClick={() => {
                                         deleteTodo(entry._id);
                                     }}
                                 >
                                     Delete
+                                </span>
+                                <span
+                                    style={{color:'green', cursor: 'pointer',margin:'5px' }}
+                                    onClick={() => {
+                                        const newName = prompt("Enter new name : ");
+                                        editTodo(entry._id,newName);
+                                        
+                                    }}
+                                >
+                                    Edit
+                                </span>
+                                <span
+                                    style={{color:'orange', cursor: 'pointer',margin:'5px',}}
+                                    onClick={() => {
+                                        let desc = prompt("Enter the description:");
+                                        descTodo(entry._id,desc);
+                                    }}
+                                >
+                                    Description
                                 </span>
                             </div>
                         ))
